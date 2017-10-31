@@ -11,8 +11,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -28,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float mAccel;
     private float mAccelCurrent;
     private float mAccelLast;
+
+    private static final String TAG = "MainActivity";
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -73,12 +80,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onClick(View view) {
                 toggleOnOff();
+
+                String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+
+                FirebaseMessaging.getInstance().subscribeToTopic("news");
+                // [END subscribe_topics]
+
+                // Log and toast
+                String msg = getString(R.string.msg_subscribed);
+                Log.d(TAG, refreshedToken);
+                Toast.makeText(MainActivity.this, refreshedToken, Toast.LENGTH_SHORT).show();
             }
         });
 
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
+            requestPermissions(new String[]{android.Manifest.permission.CAMERA}, 1);
         }
 
         sensorMan = (SensorManager)getSystemService(SENSOR_SERVICE);
